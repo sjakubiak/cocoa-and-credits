@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Cocoa &amp; Credits</title>
+<meta name="description" content="Our shared list of Hallmark Christmas movies, rated on the ornament scale.">
+<meta name="theme-color" content="#1f5a40">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='13' y='2' width='6' height='5' rx='1' fill='%23c8952b'/%3E%3Ccircle cx='16' cy='19' r='12' fill='%23b3263e'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,800&display=swap">
+<style>
+/* Layout: a snowy shared ledger — season tally, a catalog finder, the log form, then a stack of movie tickets with ornament ratings */
+:root{
+  --bg:#f3f6f4; --surface:#ffffff; --ink:#173528; --muted:#5b6f65; --line:#d6e0da;
+  --pine:#1f5a40; --berry:#b3263e; --gold:#c8952b; --chip:#e6eee9;
+  --display:"Yeseva One", Georgia, "Times New Roman", serif;
+  --body:"Nunito Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root{
+  --bg:#0f1c17; --surface:#16271f; --ink:#e9f1ec; --muted:#9db3a7; --line:#2a4136;
+  --pine:#7fc6a1; --berry:#ef6f84; --gold:#e8b85a; --chip:#203a2e; color-scheme:dark}}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5}
+[hidden]{display:none!important}
+.wrap{max-width:760px;margin:0 auto;padding-top:max(28px,env(safe-area-inset-top,0px));padding-bottom:max(60px,env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:22px}
+header h1{font-family:var(--display);font-weight:400;font-size:clamp(2rem,6vw,2.8rem);line-height:1.05;margin:0;text-wrap:balance}
+header h1 em{font-style:normal;color:var(--berry)}
+header p{margin:6px 0 0;color:var(--muted)}
+.banner{background:var(--chip);border-radius:10px;padding:10px 14px;font-size:.9rem}
+.who{display:flex;gap:10px;align-items:center;flex-wrap:wrap;color:var(--muted);font-size:.9rem}
+.who b{color:var(--ink)}
+.tally{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.tally div{background:var(--surface);padding:12px 14px;min-width:0}
+.tally b{display:block;font-family:var(--display);font-weight:400;font-size:1.6rem;color:var(--pine);font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tally span{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:12px}
+.card h2{font-family:var(--display);font-weight:400;font-size:1.3rem;margin:0}
+.card .hint{margin:-6px 0 0;color:var(--muted);font-size:.9rem}
+.finder{border-color:var(--pine)}
+form{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.full{grid-column:1/-1}
+label{display:flex;flex-direction:column;gap:4px;font-size:.75rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600;min-width:0}
+input,select,textarea{font:inherit;font-size:16px;text-transform:none;letter-spacing:0;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:9px 10px;width:100%}
+textarea{min-height:64px;resize:vertical}
+input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.row input{flex:1 1 200px;width:auto}
+.orn{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.orn button{width:30px;height:30px;border-radius:50%;border:2px solid var(--berry);background:transparent;cursor:pointer;position:relative;padding:0}
+.orn button::before{content:"";position:absolute;top:-6px;left:50%;width:8px;height:5px;margin-left:-4px;background:var(--gold);border-radius:2px 2px 0 0}
+.orn button.on{background:var(--berry)}
+.orn small{margin-left:6px;font-size:.85rem;text-transform:none;letter-spacing:0;color:var(--ink);font-weight:600}
+.tropes{display:flex;flex-wrap:wrap;gap:6px}
+.tropes button{font:inherit;font-size:.82rem;text-transform:none;letter-spacing:0;border:1px solid var(--line);background:var(--chip);color:var(--ink);border-radius:999px;padding:5px 11px;cursor:pointer}
+.tropes button.on{background:var(--pine);border-color:var(--pine);color:var(--surface)}
+.actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.btn{font:inherit;font-weight:800;border:0;border-radius:999px;padding:10px 20px;cursor:pointer;background:var(--berry);color:#fff}
+.btn.pine{background:var(--pine);color:var(--surface)}
+.btn.ghost{background:transparent;color:var(--muted);border:1px solid var(--line)}
+.btn.small{padding:7px 14px;font-size:.88rem}
+.btn:disabled{opacity:.6;cursor:default}
+.status{font-size:.85rem;color:var(--muted)}
+.matches{display:flex;flex-direction:column;gap:10px}
+.match{border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:4px;background:var(--bg)}
+.match h3{font-family:var(--display);font-weight:400;font-size:1.1rem;margin:0}
+.match p{margin:0;font-size:.92rem}
+.sub{color:var(--muted);font-size:.85rem}
+.onlist{font-size:.68rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;border-radius:4px;padding:1px 6px;margin-left:6px;vertical-align:middle;font-family:var(--body);background:var(--pine);color:var(--surface)}
+.bar{display:flex;gap:10px;flex-wrap:wrap;align-items:end}
+.bar label{flex:1 1 160px}
+.list{display:flex;flex-direction:column;gap:12px}
+.movie{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:grid;grid-template-columns:1fr auto;gap:6px 14px}
+.movie h3{font-family:var(--display);font-weight:400;font-size:1.2rem;margin:0;min-width:0;overflow-wrap:anywhere}
+.meta{grid-column:1/-1;color:var(--muted);font-size:.85rem;display:flex;flex-wrap:wrap;gap:4px 12px}
+.movie .notes{grid-column:1/-1;margin:2px 0 0;font-size:.95rem}
+.movie .premise{grid-column:1/-1;margin:0;font-size:.9rem;color:var(--muted)}
+.movie .tropes{grid-column:1/-1}
+.movie .tropes span{font-size:.75rem;background:var(--chip);border-radius:999px;padding:3px 9px}
+.dots{display:flex;gap:4px;align-items:center}
+.dots i{width:12px;height:12px;border-radius:50%;border:1.5px solid var(--berry)}
+.dots i.on{background:var(--berry)}
+.dots i.half{background:linear-gradient(90deg,var(--berry) 50%,transparent 50%)}
+.verdict{grid-column:1/-1;font-size:.8rem;font-weight:800;color:var(--berry);letter-spacing:.04em;text-transform:uppercase}
+.raters{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px}
+.raters span{font-size:.78rem;border:1px solid var(--line);border-radius:999px;padding:2px 9px;color:var(--muted)}
+.raters span b{color:var(--ink);font-weight:800}
+.row-actions{grid-column:1/-1;display:flex;gap:14px;flex-wrap:wrap}
+.link{font:inherit;font-size:.82rem;background:none;border:0;padding:0;color:var(--pine);cursor:pointer;font-weight:600}
+.link.del{color:var(--berry)}
+.empty{text-align:center;padding:30px 16px;color:var(--muted);border:1px dashed var(--line);border-radius:14px}
+.empty strong{display:block;font-family:var(--display);font-weight:400;font-size:1.3rem;color:var(--ink);margin-bottom:4px}
+@media (max-width:520px){form{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Cocoa <em>&amp;</em> Credits</h1>
+    <p>Our shared list of Hallmark Christmas movies, rated on the ornament scale.</p>
+  </header>
+
+  <div class="banner" id="banner" hidden></div>
+
+  <section class="card" id="nameCard" hidden>
+    <h2>Who's watching?</h2>
+    <p class="hint">Your name goes next to your ratings. This browser will remember it.</p>
+    <form id="nameForm" class="row" style="display:flex">
+      <input id="nameInput" autocomplete="given-name" placeholder="Your first name" aria-label="Your name" required>
+      <button class="btn pine" type="submit">Save name</button>
+    </form>
+  </section>
+  <div class="who" id="who" hidden>Rating as <b id="whoName"></b> <button class="link" type="button" id="changeName">Change name</button></div>
+
+  <section class="tally" aria-label="Season tally">
+    <div><b id="tCount">0</b><span>Movies logged</span></div>
+    <div><b id="tAvg">–</b><span>Group avg</span></div>
+    <div><b id="tTrope">–</b><span>Top trope</span></div>
+  </section>
+
+  <section class="card finder" id="finder">
+    <h2>Find a movie</h2>
+    <p class="hint">Type a title, an actor, or what happens in it, like "teacher nephew scrapbook" or "Bruce Campbell rock band". Searches <span id="catCount">the catalog</span>.</p>
+    <label>Search the catalog<input id="desc" type="search" autocomplete="off" placeholder="Actors, places, plot, title…"></label>
+    <span class="status" id="findStatus"></span>
+    <div class="matches" id="matches" aria-live="polite"></div>
+  </section>
+
+  <section class="card" id="formCard">
+    <h2 id="formTitle">Log a movie</h2>
+    <form id="f">
+      <label class="full">Title<input id="fTitle" required placeholder="e.g. Christmas at the Plaza"></label>
+      <label>Network
+        <select id="fNet">
+          <option>Hallmark</option>
+          <option>Hallmark Channel</option>
+          <option>Hallmark Mysteries</option>
+          <option>Hallmark+</option>
+          <option>Other</option>
+        </select>
+      </label>
+      <label>Release year<input id="fYear" type="number" inputmode="numeric" min="1980" max="2035" placeholder="2026"></label>
+      <label>I watched it on<input id="fDate" type="date"></label>
+      <label>Stars<input id="fStars" placeholder="Lead actors"></label>
+      <label class="full">My rating
+        <div class="orn" id="fRate" role="radiogroup" aria-label="My rating"></div>
+      </label>
+      <label class="full">Tropes spotted<div class="tropes" id="fTropes"></div></label>
+      <label class="full">Notes<textarea id="fNotes" placeholder="Who was the leading man? Did she stay in the small town?"></textarea></label>
+      <div class="actions full">
+        <button class="btn" type="submit" id="fSubmit">Add to the list</button>
+        <button class="btn ghost" type="button" id="fCancel" hidden>Cancel</button>
+        <span class="status" id="status" role="status"></span>
+      </div>
+    </form>
+  </section>
+
+  <section class="bar" aria-label="Sort and filter">
+    <label>Search our list<input id="q" type="search" placeholder="Title, stars or notes"></label>
+    <label>Sort by
+      <select id="sort">
+        <option value="added">Recently added</option>
+        <option value="rating">Highest rated</option>
+        <option value="title">Title A–Z</option>
+        <option value="year">Newest movies</option>
+      </select>
+    </label>
+    <label>Show
+      <select id="who2"><option value="all">Everyone's movies</option><option value="mine">Ones I've rated</option><option value="unrated">Ones I haven't rated</option></select>
+    </label>
+  </section>
+
+  <section class="list" id="list" aria-live="polite"><div class="empty"><strong>Loading the list…</strong></div></section>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script>
+<script src="search.js"></script>
+<script>
+const VERDICTS=["","Lump of coal","Re-gift it","Cozy enough","Hot cocoa","Instant classic"];
+const TROPES=["Big-city career woman","Small-town return","Bakery or cookie contest","Christmas tree farm","Inn to save","Royal romance","Fake relationship","Ex comes home","Secret Santa","Widowed dad + cute kid","Snowed in","Mysterious Santa cameo"];
+const NETS=["Hallmark","Hallmark Channel","Hallmark Mysteries","Hallmark+","Other"];
+const $=id=>document.getElementById(id);
+let movies=[], ratings=[], catalog=[], prepared=[], rating=0, picked=new Set(), editing=null, pickedCatalogId=null;
+let myName="", me="";
+
+/* ---------- helpers ---------- */
+function today(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function setStatus(t){$("status").textContent=t||""}
+function keyOf(t,y){return String(t||"").trim().toLowerCase()+"|"+(y||0)}
+function ratingsFor(id){return ratings.filter(r=>r.movie_id===id)}
+function avg(id){const v=ratingsFor(id).map(r=>r.rating).filter(n=>n>0);return v.length?v.reduce((a,b)=>a+b,0)/v.length:0}
+function mine(id){const r=ratings.find(r=>r.movie_id===id&&r.person===me);return r?r.rating:0}
+function myWatched(id){const r=ratings.find(r=>r.movie_id===id&&r.person===me);return r&&r.watched||""}
+function lsGet(k){try{return localStorage.getItem(k)}catch{return null}}
+function lsSet(k,v){try{localStorage.setItem(k,v)}catch{}}
+
+/* ---------- storage: Supabase when configured, this browser otherwise ---------- */
+const cfg=window.COCOA_CONFIG||{};
+const configured=!!(cfg.supabaseUrl&&cfg.supabaseAnonKey&&!/YOUR_/.test(cfg.supabaseUrl+cfg.supabaseAnonKey));
+const sb=configured&&window.supabase?window.supabase.createClient(cfg.supabaseUrl,cfg.supabaseAnonKey):null;
+
+const remote={
+  async loadCatalog(){const {data,error}=await sb.from("catalog").select("id,title,year,network,stars,premise").range(0,4999);if(error)throw error;return data},
+  async loadAll(){
+    const [m,r]=await Promise.all([sb.from("movies").select("*").order("created_at",{ascending:false}).range(0,4999),sb.from("ratings").select("*").range(0,19999)]);
+    if(m.error)throw m.error;if(r.error)throw r.error;return {movies:m.data,ratings:r.data};
+  },
+  async addMovie(row){const {data,error}=await sb.from("movies").insert(row).select().single();if(error)throw error;return data},
+  async updateMovie(id,row){const {error}=await sb.from("movies").update(row).eq("id",id);if(error)throw error},
+  async rate(row){const {error}=await sb.from("ratings").upsert(row,{onConflict:"movie_id,person"});if(error)throw error},
+  async remove(id){const {error}=await sb.from("movies").delete().eq("id",id);if(error)throw error}
+};
+const local={
+  read(){try{return JSON.parse(lsGet("cc-data")||'{"movies":[],"ratings":[]}')}catch{return {movies:[],ratings:[]}}},
+  write(d){lsSet("cc-data",JSON.stringify(d))},
+  async loadCatalog(){return []},
+  async loadAll(){return this.read()},
+  async addMovie(row){const d=this.read();if(d.movies.some(m=>keyOf(m.title,m.year)===keyOf(row.title,row.year))){const e=new Error("dup");e.code="23505";throw e}
+    const m={id:"m"+Date.now().toString(36)+Math.random().toString(36).slice(2,6),created_at:new Date().toISOString(),...row};d.movies.unshift(m);this.write(d);return m},
+  async updateMovie(id,row){const d=this.read();const m=d.movies.find(x=>x.id===id);if(m)Object.assign(m,row);this.write(d)},
+  async rate(row){const d=this.read();const i=d.ratings.findIndex(r=>r.movie_id===row.movie_id&&r.person===row.person);i>=0?d.ratings[i]=row:d.ratings.push(row);this.write(d)},
+  async remove(id){const d=this.read();d.movies=d.movies.filter(m=>m.id!==id);d.ratings=d.ratings.filter(r=>r.movie_id!==id);this.write(d)}
+};
+const store=sb?remote:local;
+
+async function refresh(){
+  try{const d=await store.loadAll();movies=d.movies||[];ratings=d.ratings||[];render()}
+  catch(e){if(!movies.length)$("list").innerHTML='<div class="empty"><strong>Can\'t reach the list right now</strong>Check your connection, then reload the page.</div>'}
+}
+
+/* ---------- name ---------- */
+function setName(n){myName=n.trim().replace(/\s+/g," ");me=myName.toLowerCase();lsSet("cc-name",myName);showName()}
+function showName(){
+  const has=!!myName;$("nameCard").hidden=has;$("who").hidden=!has;$("whoName").textContent=myName;
+}
+$("nameForm").addEventListener("submit",e=>{e.preventDefault();const v=$("nameInput").value.trim();if(v){setName(v);render()}});
+$("changeName").onclick=()=>{$("nameInput").value=myName;myName="";me="";showName();$("nameInput").focus()};
+
+/* ---------- form ---------- */
+function drawRate(){
+  const el=$("fRate");el.innerHTML="";
+  for(let i=1;i<=5;i++){const b=document.createElement("button");b.type="button";b.className=i<=rating?"on":"";b.setAttribute("aria-label",i+" ornaments: "+VERDICTS[i]);b.setAttribute("role","radio");b.setAttribute("aria-checked",String(i===rating));b.onclick=()=>{rating=rating===i?0:i;drawRate()};el.appendChild(b)}
+  const s=document.createElement("small");s.textContent=rating?VERDICTS[rating]:"Tap to rate";el.appendChild(s);
+}
+function drawTropes(){
+  const el=$("fTropes");el.innerHTML="";
+  TROPES.forEach(t=>{const b=document.createElement("button");b.type="button";b.textContent=t;b.className=picked.has(t)?"on":"";b.setAttribute("aria-pressed",String(picked.has(t)));b.onclick=()=>{picked.has(t)?picked.delete(t):picked.add(t);drawTropes()};el.appendChild(b)});
+}
+function resetForm(){
+  editing=null;pickedCatalogId=null;rating=0;picked=new Set();$("f").reset();$("fDate").value=today();
+  $("formTitle").textContent="Log a movie";$("fSubmit").textContent="Add to the list";$("fCancel").hidden=true;drawRate();drawTropes();
+}
+function fillForm(m,title,myRating,watched){
+  $("fTitle").value=m.title||"";$("fNet").value=NETS.includes(m.network)?m.network:(m.network?"Other":"Hallmark");
+  $("fYear").value=m.year||"";$("fStars").value=m.stars||"";$("fNotes").value=m.notes||"";
+  $("fDate").value=watched||today();rating=myRating||0;picked=new Set(m.tropes||[]);
+  drawRate();drawTropes();$("formTitle").textContent=title;$("fCancel").hidden=false;
+  $("formCard").scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"});
+}
+$("fCancel").onclick=resetForm;
+
+$("f").addEventListener("submit",async e=>{
+  e.preventDefault();
+  if(!me){setStatus("Add your name first, at the top of the page.");$("nameInput").focus();return}
+  const title=$("fTitle").value.trim();if(!title)return;
+  const year=$("fYear").value?+$("fYear").value:null;
+  const shared={title,year,network:$("fNet").value,stars:$("fStars").value.trim(),tropes:[...picked],notes:$("fNotes").value.trim()};
+  $("fSubmit").disabled=true;
+  try{
+    let id=editing, note="Saved";
+    if(!id){
+      const existing=movies.find(m=>keyOf(m.title,m.year)===keyOf(title,year));
+      if(existing){id=existing.id;note="Already on the list, so your rating was added to it"}
+      else{
+        try{const m=await store.addMovie({...shared,catalog_id:pickedCatalogId,added_by:myName});id=m.id;note="Added "+title}
+        catch(err){if(err&&err.code==="23505"){await refresh();const ex=movies.find(m=>keyOf(m.title,m.year)===keyOf(title,year));if(!ex)throw err;id=ex.id;note="Already on the list, so your rating was added to it"}else throw err}
+      }
+    }else{await store.updateMovie(id,shared)}
+    await store.rate({movie_id:id,person:me,person_name:myName,rating,watched:$("fDate").value||null,updated_at:new Date().toISOString()});
+    setStatus(note);resetForm();await refresh();
+  }catch(err){console.error(err);setStatus("Couldn't save that. Check your connection and try again.")}
+  finally{$("fSubmit").disabled=false}
+});
+
+/* ---------- catalog finder ---------- */
+let searchTimer=null;
+$("desc").addEventListener("input",()=>{clearTimeout(searchTimer);searchTimer=setTimeout(runSearch,120)});
+function runSearch(){
+  const q=$("desc").value.trim();
+  if(!q){$("matches").innerHTML="";$("findStatus").textContent="";return}
+  if(!prepared.length){$("findStatus").textContent="The catalog is still loading…";return}
+  const res=CatalogSearch.search(prepared,q,6);
+  $("findStatus").textContent=res.length?"":"No match in the catalog. Try an actor's name or a different detail, or log it yourself below.";
+  $("matches").innerHTML=res.map(({movie:x})=>{
+    const onList=movies.find(m=>keyOf(m.title,m.year)===keyOf(x.title,x.year));
+    return '<div class="match"><h3>'+esc(x.title)+' ('+esc(x.year)+')'+(onList?'<span class="onlist">On our list</span>':"")+'</h3>'+
+      '<div class="sub">'+esc(x.stars||"Cast not listed")+'</div>'+(x.premise?'<p>'+esc(x.premise)+'</p>':"")+
+      '<div class="actions"><button class="btn small" type="button" data-pick="'+esc(x.id)+'">'+(onList?(mine(onList.id)?"Edit my rating":"Rate this one"):"Log this one")+'</button></div></div>';
+  }).join("");
+}
+$("matches").addEventListener("click",e=>{
+  const id=e.target.dataset.pick;if(!id)return;const x=catalog.find(c=>c.id===id);if(!x)return;
+  const existing=movies.find(m=>keyOf(m.title,m.year)===keyOf(x.title,x.year));
+  if(existing){editing=existing.id;fillForm(existing,"Rate "+existing.title,mine(existing.id),myWatched(existing.id));$("fSubmit").textContent="Save"}
+  else{editing=null;fillForm({title:x.title,year:x.year,network:x.network,stars:x.stars},"Log a movie",0,"");pickedCatalogId=x.id;$("fSubmit").textContent="Add to the list"}
+});
+
+/* ---------- list ---------- */
+function render(){
+  const n=movies.length, avgs=movies.map(m=>avg(m.id)).filter(Boolean);
+  $("tCount").textContent=n;
+  $("tAvg").textContent=avgs.length?(avgs.reduce((a,b)=>a+b,0)/avgs.length).toFixed(1):"–";
+  const tc={};movies.forEach(m=>(m.tropes||[]).forEach(t=>tc[t]=(tc[t]||0)+1));
+  const top=Object.entries(tc).sort((a,b)=>b[1]-a[1])[0];
+  $("tTrope").textContent=top?top[0]:"–";$("tTrope").title=top?top[0]:"";
+
+  const q=$("q").value.trim().toLowerCase(), who=$("who2").value, sort=$("sort").value;
+  let v=movies.filter(m=>(who==="all"||(who==="mine"?mine(m.id):!mine(m.id)))&&(!q||[m.title,m.stars,m.notes,ratingsFor(m.id).map(r=>r.person_name).join(" ")].join(" ").toLowerCase().includes(q)));
+  v.sort((a,b)=>sort==="rating"?avg(b.id)-avg(a.id):sort==="title"?a.title.localeCompare(b.title):sort==="year"?(b.year||0)-(a.year||0):String(b.created_at||"").localeCompare(String(a.created_at||"")));
+  const list=$("list");
+  if(!n){list.innerHTML='<div class="empty"><strong>The list is empty</strong>Find a movie in the catalog above, or log one yourself, and it will show up here with its rating.</div>';return}
+  if(!v.length){list.innerHTML='<div class="empty"><strong>No matches</strong>Try a different search or filter.</div>';return}
+  list.innerHTML=v.map(m=>{
+    const a=avg(m.id), r=Math.round(a*2)/2, rs=ratingsFor(m.id).filter(x=>x.rating>0);
+    const dots=[1,2,3,4,5].map(i=>'<i class="'+(i<=r?"on":(i-.5===r?"half":""))+'"></i>').join("");
+    const cat=m.catalog_id&&catalog.find(c=>c.id===m.catalog_id);
+    return '<article class="movie"><h3>'+esc(m.title)+'</h3>'+
+      '<div class="dots" aria-label="Group average '+(a?a.toFixed(1):"none")+' of 5 ornaments">'+dots+'</div>'+
+      (a?'<div class="verdict">'+VERDICTS[Math.round(a)]+(rs.length>1?" · avg "+a.toFixed(1):"")+'</div>':"")+
+      '<div class="meta">'+[m.network,m.year,m.stars,m.added_by&&"Added by "+m.added_by].filter(Boolean).map(x=>"<span>"+esc(x)+"</span>").join("")+'</div>'+
+      (rs.length?'<div class="raters">'+rs.map(x=>'<span>'+esc(x.person===me?"You":x.person_name)+' <b>'+x.rating+'</b></span>').join("")+'</div>':"")+
+      (cat&&cat.premise?'<p class="premise">'+esc(cat.premise)+'</p>':"")+
+      ((m.tropes||[]).length?'<div class="tropes">'+m.tropes.map(t=>"<span>"+esc(t)+"</span>").join("")+'</div>':"")+
+      (m.notes?'<p class="notes">'+esc(m.notes)+'</p>':"")+
+      '<div class="row-actions"><button class="link" type="button" data-edit="'+esc(m.id)+'">'+(mine(m.id)?"Edit my rating":"Rate it")+'</button><button class="link del" type="button" data-del="'+esc(m.id)+'">Remove</button></div></article>';
+  }).join("");
+}
+$("list").addEventListener("click",async e=>{
+  const ed=e.target.dataset.edit, del=e.target.dataset.del;
+  if(ed){const m=movies.find(x=>x.id===ed);if(!m)return;editing=m.id;fillForm(m,"Rate "+m.title,mine(m.id),myWatched(m.id));$("fSubmit").textContent="Save"}
+  if(del){
+    if(e.target.dataset.armed){try{await store.remove(del);setStatus("Removed");await refresh()}catch{setStatus("Couldn't remove that one.")}}
+    else{e.target.dataset.armed="1";e.target.textContent="Tap again to remove for everyone";setTimeout(()=>{if(e.target.isConnected){delete e.target.dataset.armed;e.target.textContent="Remove"}},4000)}
+  }
+});
+["q","sort","who2"].forEach(id=>$(id).addEventListener("input",render));
+
+/* ---------- start ---------- */
+async function loadCatalog(){
+  let rows=[];
+  try{rows=await store.loadCatalog()}catch(e){console.warn("Catalog table unavailable, using catalog.json",e)}
+  if(!rows||!rows.length){try{rows=await (await fetch("catalog.json")).json()}catch{rows=[]}}
+  catalog=rows;prepared=CatalogSearch.prepare(catalog);
+  $("catCount").textContent=catalog.length?catalog.length+" Hallmark Christmas movies":"the catalog";
+  runSearch();render();
+}
+async function init(){
+  resetForm();
+  const saved=lsGet("cc-name");if(saved)setName(saved);else showName();
+  if(!sb){const b=$("banner");b.hidden=false;b.textContent=configured?"Couldn't load the database library. Check your connection and reload.":"Not connected to a database yet, so entries are saved in this browser only. See README.md to connect Supabase.";}
+  await Promise.all([loadCatalog(),refresh()]);
+  setInterval(()=>{if(document.visibilityState==="visible")refresh()},30000);
+  document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")refresh()});
+}
+init();
+</script>
+</body>
+</html>
