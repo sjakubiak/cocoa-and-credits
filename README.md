@@ -2,42 +2,27 @@
 
 A shared website for logging and rating Hallmark Christmas movies. Anyone with the link can search the catalog, add movies, and rate them. No accounts needed: each person types their name once and their browser remembers it.
 
-- `site/` is the website (plain HTML, nothing to build).
-- `supabase/` has the database setup: `schema.sql` creates the tables, `catalog_seed.sql` loads the movie catalog (486 Hallmark Christmas movies, 2000–2026).
+Live at **https://cocoa-and-credits.pages.dev**, hosted free on Cloudflare Pages with a Cloudflare D1 database.
 
-Setup takes about 15 minutes, all on free plans.
+## What's in the repo
 
-## 1. Create the database (Supabase)
+- `site/` is the website (plain HTML, nothing to build). `site/catalog.json` is the catalog of 486 Hallmark Christmas movies from 2000–2026 that the search uses.
+- `functions/api/[[path]].js` is the small API the page calls to read and save the shared list. Cloudflare Pages runs it automatically.
+- `d1/schema.sql` creates the two database tables, `movies` and `ratings`.
 
-1. Sign up at supabase.com and create a new project (any name, pick a region near you, save the database password somewhere).
-2. When it's ready, open **SQL Editor** → **New query**. Paste all of `supabase/schema.sql` and click **Run**.
-3. New query again. Paste all of `supabase/catalog_seed.sql` and click **Run**.
-4. Open **Project Settings → API** (or the **Connect** button). Copy the **Project URL** and the **anon public** key.
-5. Open `site/config.js` and paste them in place of `YOUR_SUPABASE_URL` and `YOUR_SUPABASE_ANON_KEY`.
+## How it's set up on Cloudflare
 
-The anon key is meant to be public. It only allows what the database rules allow: reading the catalog, and adding, rating and removing movies on the list.
+- **Pages project:** `cocoa-and-credits`, connected to this GitHub repo. Build command is empty, and the build output directory is `site`. Every push to `main` deploys automatically.
+- **Database:** a D1 database named `cocoa-and-credits`, bound to the Pages project as `DB` (Settings → Bindings).
+- To recreate the tables, paste `d1/schema.sql` into the database's **Console** tab in the Cloudflare dashboard.
 
-## 2. Put the site online (Render)
-
-1. Create a new GitHub repository (for example `cocoa-and-credits`) and upload this whole folder to it.
-2. In Render, choose **New → Static Site** and pick that repository.
-3. Settings:
-   - **Build Command:** leave empty
-   - **Publish Directory:** `site`
-4. Click **Create Static Site**. Render gives you a link like `cocoa-and-credits.onrender.com`. Share that link.
-
-Render static sites stay online on the free plan and don't go to sleep.
-
-## Also on Cloudflare Pages
-
-The same repo deploys to Cloudflare Pages at `cocoa-and-credits.pages.dev` (build command empty, output directory `site`). Both sites share the Supabase database.
+The free plans cover this easily, and D1 doesn't pause when the site goes unused.
 
 ## Good to know
 
-- **Free Supabase projects pause after a week with no visits.** If that happens, sign in to Supabase and click **Restore project**. Your data is kept.
-- **Anyone with the link can edit or remove movies.** Removing asks for a second tap first.
-- **The catalog lives in the `catalog` table.** To add a movie or fix a detail, use Supabase's **Table Editor**. Changes show up in search the next time the page loads. The `premise` column is what lets plot searches work, so fill it in for movies you care about.
-- **Without the Supabase keys,** the site still works but saves only in that one browser. This is handy for trying it out.
+- **Anyone with the link can add, edit or remove movies.** Removing asks for a second tap first.
+- **To fix or add a catalog movie,** edit `site/catalog.json` and push. The `premise` field is what lets plot searches work.
+- **To see or edit the raw data,** open the D1 database in the Cloudflare dashboard and use **Explore Data** or the **Console** tab.
 
 ## How the search works
 
