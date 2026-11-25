@@ -2,18 +2,19 @@
 
 A shared website for logging and rating Hallmark Christmas movies. Anyone with the link can search the catalog, add movies, and rate them. No accounts needed: each person types their name once and their browser remembers it.
 
-Live at **https://cocoa-and-credits.pages.dev**, hosted free on Cloudflare Pages with a Cloudflare D1 database.
+Live at **https://cocoa-and-credits.novascotia.workers.dev**, hosted free as a Cloudflare Worker with a Cloudflare D1 database.
 
 ## What's in the repo
 
 - `site/` is the website (plain HTML, nothing to build). `site/catalog.json` is the catalog of 486 Hallmark Christmas movies from 2000–2026 that the search uses.
-- `functions/api/[[path]].js` is the small API the page calls to read and save the shared list. Cloudflare Pages runs it automatically.
+- `src/worker.js` is the Worker: it serves `site/` and sends `/api/*` requests to `functions/api/[[path]].js`, the small API that reads and saves the shared list.
+- `wrangler.jsonc` is the Worker's configuration, including the D1 database binding.
 - `d1/schema.sql` creates the two database tables, `movies` and `ratings`.
 
 ## How it's set up on Cloudflare
 
-- **Pages project:** `cocoa-and-credits`, connected to this GitHub repo. Build command is empty, and the build output directory is `site`. Every push to `main` deploys automatically.
-- **Database:** a D1 database named `cocoa-and-credits`, bound to the Pages project as `DB` (Settings → Bindings).
+- **Worker:** `cocoa-and-credits`, connected to this GitHub repo. Cloudflare runs `npx wrangler deploy` on every push to `main`.
+- **Database:** a D1 database named `cocoa-and-credits`, bound to the Worker as `DB` in `wrangler.jsonc`.
 - To recreate the tables, paste `d1/schema.sql` into the database's **Console** tab in the Cloudflare dashboard.
 
 The free plans cover this easily, and D1 doesn't pause when the site goes unused.
