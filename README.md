@@ -28,6 +28,10 @@ The anon key is meant to be public. It only allows what the database rules allow
 
 Render static sites stay online on the free plan and don't go to sleep.
 
+## Also on Cloudflare Pages
+
+The same repo deploys to Cloudflare Pages at `cocoa-and-credits.pages.dev` (build command empty, output directory `site`). Both sites share the Supabase database.
+
 ## Good to know
 
 - **Free Supabase projects pause after a week with no visits.** If that happens, sign in to Supabase and click **Restore project**. Your data is kept.
