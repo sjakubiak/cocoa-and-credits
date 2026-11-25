@@ -176,8 +176,6 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-vis
   <section class="list" id="list" aria-live="polite"><div class="empty"><strong>Loading the list…</strong></div></section>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="config.js"></script>
 <script src="search.js"></script>
 <script>
 const VERDICTS=["","Lump of coal","Re-gift it","Cozy enough","Hot cocoa","Instant classic"];
@@ -199,21 +197,20 @@ function myWatched(id){const r=ratings.find(r=>r.movie_id===id&&r.person===me);r
 function lsGet(k){try{return localStorage.getItem(k)}catch{return null}}
 function lsSet(k,v){try{localStorage.setItem(k,v)}catch{}}
 
-/* ---------- storage: Supabase when configured, this browser otherwise ---------- */
-const cfg=window.COCOA_CONFIG||{};
-const configured=!!(cfg.supabaseUrl&&cfg.supabaseAnonKey&&!/YOUR_/.test(cfg.supabaseUrl+cfg.supabaseAnonKey));
-const sb=configured&&window.supabase?window.supabase.createClient(cfg.supabaseUrl,cfg.supabaseAnonKey):null;
-
+/* ---------- storage: the site's own /api (Cloudflare D1); this browser only if the API is missing ---------- */
+async function api(method,path,body){
+  const res=await fetch("/api"+path,{method,headers:body?{"content-type":"application/json"}:{},body:body?JSON.stringify(body):undefined});
+  let data=null;try{data=await res.json()}catch{}
+  if(!res.ok){const e=new Error((data&&data.error)||("HTTP "+res.status));e.status=res.status;if(res.status===409)e.code="23505";throw e}
+  return data;
+}
 const remote={
-  async loadCatalog(){const {data,error}=await sb.from("catalog").select("id,title,year,network,stars,premise").range(0,4999);if(error)throw error;return data},
-  async loadAll(){
-    const [m,r]=await Promise.all([sb.from("movies").select("*").order("created_at",{ascending:false}).range(0,4999),sb.from("ratings").select("*").range(0,19999)]);
-    if(m.error)throw m.error;if(r.error)throw r.error;return {movies:m.data,ratings:r.data};
-  },
-  async addMovie(row){const {data,error}=await sb.from("movies").insert(row).select().single();if(error)throw error;return data},
-  async updateMovie(id,row){const {error}=await sb.from("movies").update(row).eq("id",id);if(error)throw error},
-  async rate(row){const {error}=await sb.from("ratings").upsert(row,{onConflict:"movie_id,person"});if(error)throw error},
-  async remove(id){const {error}=await sb.from("movies").delete().eq("id",id);if(error)throw error}
+  async loadCatalog(){return []},
+  async loadAll(){return api("GET","/data")},
+  async addMovie(row){return api("POST","/movies",row)},
+  async updateMovie(id,row){await api("PATCH","/movies/"+encodeURIComponent(id),row)},
+  async rate(row){await api("PUT","/ratings",row)},
+  async remove(id){await api("DELETE","/movies/"+encodeURIComponent(id))}
 };
 const local={
   read(){try{return JSON.parse(lsGet("cc-data")||'{"movies":[],"ratings":[]}')}catch{return {movies:[],ratings:[]}}},
@@ -226,7 +223,7 @@ const local={
   async rate(row){const d=this.read();const i=d.ratings.findIndex(r=>r.movie_id===row.movie_id&&r.person===row.person);i>=0?d.ratings[i]=row:d.ratings.push(row);this.write(d)},
   async remove(id){const d=this.read();d.movies=d.movies.filter(m=>m.id!==id);d.ratings=d.ratings.filter(r=>r.movie_id!==id);this.write(d)}
 };
-const store=sb?remote:local;
+let store=remote;
 
 async function refresh(){
   try{const d=await store.loadAll();movies=d.movies||[];ratings=d.ratings||[];render()}
@@ -362,7 +359,10 @@ async function loadCatalog(){
 async function init(){
   resetForm();
   const saved=lsGet("cc-name");if(saved)setName(saved);else showName();
-  if(!sb){const b=$("banner");b.hidden=false;b.textContent=configured?"Couldn't load the database library. Check your connection and reload.":"Not connected to a database yet, so entries are saved in this browser only. See README.md to connect Supabase.";}
+  try{await api("GET","/health")}
+  catch(e){
+    if(e.status===404||e.status===503){store=local;const b=$("banner");b.hidden=false;b.textContent="Not connected to the shared database, so entries are saved in this browser only.";}
+  }
   await Promise.all([loadCatalog(),refresh()]);
   setInterval(()=>{if(document.visibilityState==="visible")refresh()},30000);
   document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")refresh()});
